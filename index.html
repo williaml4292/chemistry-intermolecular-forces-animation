@@ -28,21 +28,35 @@
                 }
                 make(){
                     fill(255,0,0)
-                    ellipse(x,y,100)
+                    ellipse(this.x,this.y,75)
                     fill(255)
-                    ellipse(x - 50,y + 50,50)
-                    ellipse(x - 50,y + 50,50)
+                    ellipse(this.x - 37.5,this.y + 37.5,37.5)
+                    ellipse(this.x + 37.5,this.y + 37.5,37.5)
+                }
+                movement(){
+                    this.x += moveX
+                    this.y += moveY
+                    if (this.x > width - 25 || this.x < 25){
+                        moveX *= -1
+                    }
+                    if (this.y > height - 25 || this.y < 25){
+                        moveY *= -1
+                    }
                 }
             }
+            var moveX = 5
+            var moveY = 5
             var molecules = []
             function setup() {
                 createCanvas(800, 600);
-                molecules.push(new water(200,200))
+                molecules.push(new water(random(width),random(height)))
             }
 
             function draw() {
+                background(200,200,255)
                 for (var i = 0;i < molecules.length;i++){
-                    molecules.make()
+                    molecules[i].movement()
+                    molecules[i].make()
                 }
             }
 

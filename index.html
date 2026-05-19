@@ -48,8 +48,11 @@
                         ellipse(this.x + 31.25,this.y + 31.25,31.25)
                     }
                     else{
+                        fill(255)
                         ellipse(this.x,height-this.y + 31.25,31.25)
                         ellipse(this.x,height-this.y,31.25)
+                        fill(255,0,0)
+                        ellipse(random(50,width-50),height-this.y, 62.5)
                     }
                 }
                 movement(){

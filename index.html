@@ -59,7 +59,7 @@
                     }
                 }
             }
-            var temperature = 25°C
+            var temperature = "25°C"
             var molecules = []
             function setup() {
                 angleMode(DEGREES)
@@ -70,7 +70,10 @@
             }
 
             function draw() {
-                text(temperature, 100,100)
+                textSize(20)
+                strokeWeight(20)
+                stroke("black")
+                text("hello", 100,100)
                 background(200,200,255)
                 fill(100,100,255)
                 rect(0, height/2, width)

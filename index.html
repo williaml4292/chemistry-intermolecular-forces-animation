@@ -48,6 +48,7 @@
                         if (this.multiX > -0.4 && this.multiX < 0.4){
                             this.multiX = random(-0.8,-1.2)
                         }
+                        this.multiX = constrain(this.multiX,3, 10)
                         this.moveX *= this.multiX
                     }
                     if (this.y > height - 31.25 || this.y < height/2 + 25){
@@ -55,6 +56,7 @@
                         if (this.multiY > -0.4 && this.multiY < 0.4){
                             this.multiY = random(-0.8, -1.2)
                         }
+                        this.multiY = constrain(this.multiY,3, 10)
                         this.moveY *= this.multiY
                     }
                 }

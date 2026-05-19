@@ -59,7 +59,8 @@
                     }
                 }
             }
-            var temperature = 25
+            var initial = 25
+            var temperature = initial + "something"
             var molecules = []
             function setup() {
                 angleMode(DEGREES)
@@ -70,6 +71,7 @@
             }
 
             function draw() {
+                temperature = initial + "something"
                 background(200,200,255)
                 fill(255,100,100)
                 textSize(50)
@@ -78,7 +80,10 @@
                 fill(100,100,255)
                 rect(0, height/2, width)
                 if (frameCount % 5 == 0 && frameCount > 30){
-                    temperature++
+                    initial++
+                     fill(255,100,100)
+                    textSize(50)
+                    text(temperature,25,50)
                 }
                 for (var i = 0;i < molecules.length;i++){
                     molecules[i].make()

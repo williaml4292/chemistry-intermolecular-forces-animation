@@ -27,12 +27,14 @@
                     this.y = y
                     this.moveX = random(-10,-10)
                     this.moveY = random(-10,10)
-                    this.rotate = random(0,360)
+                    this.multiX;
+                    this.multiY;
+                    // this.rotate = random(0,360)
                 }
                 make(){
                     fill(255,0,0)
-                    translate(width/2,height/2)
-                    rotate(this.rotate)
+                    // translate(width/2,height/2)
+                    // rotate(this.rotate)
                     ellipse(this.x,this.y,75)
                     fill(255)
                     ellipse(this.x - 37.5,this.y + 37.5,37.5)
@@ -42,10 +44,18 @@
                     this.x += this.moveX
                     this.y += this.moveY
                     if (this.x > width - 25 || this.x < 25){
-                        this.moveX *= random(-0.8,-1.2)
+                        this.multiX = random(-0.8,-1.2)
+                        if (this.multiX > -0.4 && this.multiX < 0.4){
+                            this.multiX = random(-0.8,-1.2)
+                        }
+                        this.moveX *= this.multiX
                     }
-                    if (this.y > height - 25 || this.y < 25){
-                        this.moveY *= random(-0.8,-1.2)
+                    if (this.y > height - 25 || this.y < height/2){
+                        this.multiY = random(-0.8,-1.2)
+                        if (this.multiY > -0.4 && this.multiY < 0.4){
+                            this.multiY = random(-0.8, -1.2)
+                        }
+                        this.moveY *= this.multiY
                     }
                 }
             }
@@ -54,7 +64,7 @@
                 angleMode(DEGREES)
                 createCanvas(800, 600);
                 for (var i = 0;i < 10;i++){
-                    molecules.push(new water(random(50,width-50),random(50,height - 50)))
+                    molecules.push(new water(random(50,width-50),random(height/2,height - 50)))
                 }
             }
 

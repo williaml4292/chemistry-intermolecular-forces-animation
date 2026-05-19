@@ -29,12 +29,9 @@
                     this.moveY = random(-10,10)
                     this.multiX;
                     this.multiY;
-                    // this.rotate = random(0,360)
                 }
                 make(){
                     fill(255,0,0)
-                    // translate(width/2,height/2)
-                    // rotate(this.rotate)
                     ellipse(this.x,this.y,62.5)
                     fill(255)
                     ellipse(this.x - 31.25,this.y + 31.25,31.25)
@@ -62,7 +59,7 @@
             var initial = 25
             var temperature;
             var molecules = []
-            var probability = 1.1
+            var probability;
             function setup() {
                 angleMode(DEGREES)
                 createCanvas(800, 600);
@@ -73,7 +70,7 @@
 
             function draw() {
                 temperature = initial + " °C"
-                probability = probability ** 2
+                probability = frameCount/4
                 console.log(probability)
                 background(200,200,255)
                 fill(255,100,100)

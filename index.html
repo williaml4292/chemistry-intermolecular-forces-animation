@@ -31,11 +31,17 @@
                     this.multiY;
                 }
                 make(){
-                    fill(255,0,0)
-                    ellipse(this.x,this.y,62.5)
-                    fill(255)
-                    ellipse(this.x - 31.25,this.y + 31.25,31.25)
-                    ellipse(this.x + 31.25,this.y + 31.25,31.25)
+                    if (random(probability) < 75 && initial > 75){
+                        fill(255,0,0)
+                        ellipse(this.x,this.y,62.5)
+                        fill(255)
+                        ellipse(this.x - 31.25,this.y + 31.25,31.25)
+                        ellipse(this.x + 31.25,this.y + 31.25,31.25)
+                    }
+                    else{
+                        ellipse(this.x - 31.25,this.y + 31.25,31.25)
+                        ellipse(this.x + 31.25,this.y + 31.25,31.25)
+                    }
                 }
                 movement(){
                     this.x += this.moveX

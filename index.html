@@ -35,10 +35,10 @@
                     fill(255,0,0)
                     // translate(width/2,height/2)
                     // rotate(this.rotate)
-                    ellipse(this.x,this.y,75)
+                    ellipse(this.x,this.y,62.5)
                     fill(255)
-                    ellipse(this.x - 37.5,this.y + 37.5,37.5)
-                    ellipse(this.x + 37.5,this.y + 37.5,37.5)
+                    ellipse(this.x - 31.25,this.y + 31.25,31.25)
+                    ellipse(this.x + 31.25,this.y + 31.25,31.25)
                 }
                 movement(){
                     this.x += this.moveX
@@ -50,7 +50,7 @@
                         }
                         this.moveX *= this.multiX
                     }
-                    if (this.y > height - 25 || this.y < height/2){
+                    if (this.y > height - 31.25 || this.y < height/2 + 30){
                         this.multiY = random(-0.8,-1.2)
                         if (this.multiY > -0.4 && this.multiY < 0.4){
                             this.multiY = random(-0.8, -1.2)
@@ -64,12 +64,14 @@
                 angleMode(DEGREES)
                 createCanvas(800, 600);
                 for (var i = 0;i < 10;i++){
-                    molecules.push(new water(random(50,width-50),random(height/2 + 50,height - 50)))
+                    molecules.push(new water(random(50,width-50),random(height/2 + 31.25,height - 50)))
                 }
             }
 
             function draw() {
                 background(200,200,255)
+                fill(100,100,255)
+                rect(0, height/2, width)
                 for (var i = 0;i < molecules.length;i++){
                     molecules[i].make()
                     molecules[i].movement()

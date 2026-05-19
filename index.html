@@ -59,8 +59,8 @@
                     }
                 }
             }
-            var initial = 25
-            var temperature = initial + "°C"
+            var initial;
+            var temperature;
             var molecules = []
             function setup() {
                 angleMode(DEGREES)
@@ -68,6 +68,8 @@
                 for (var i = 0;i < 10;i++){
                     molecules.push(new water(random(50,width-50),random(height/2 + 31.25,height - 50)))
                 }
+                initial = 25
+                temperature = initial
             }
 
             function draw() {
@@ -75,10 +77,11 @@
                 fill(255,100,100)
                 textSize(50)
                 text(temperature,25,50)
+                // text(degrees, 85, 50)
                 fill(100,100,255)
                 rect(0, height/2, width)
                 if (frameCount % 5 == 0 && frameCount > 30){
-                    console.log('hello')
+                    initial++
                 }
                 for (var i = 0;i < molecules.length;i++){
                     molecules[i].make()

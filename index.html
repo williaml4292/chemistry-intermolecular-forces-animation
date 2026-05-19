@@ -29,9 +29,18 @@
                     this.moveY = random(-10,10)
                     this.multiX;
                     this.multiY;
+                    this.state = "liquid"
+                    this.counter = 0;
                 }
                 make(){
-                    if (random(probability) < 75){
+                    if (random(probability) < 75 && this.counter == 0){
+                        this.state = "liquid"
+                    }
+                    else{
+                        this.counter++
+                        this.state = "gas"
+                    }
+                    if (this.state == "liquid"){
                         fill(255,0,0)
                         ellipse(this.x,this.y,62.5)
                         fill(255)

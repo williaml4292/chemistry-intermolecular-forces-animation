@@ -25,32 +25,37 @@
                 constructor(x,y){
                     this.x = x
                     this.y = y
+                    this.moveX = random(-10,-10)
+                    this.moveY = random(-10,10)
+                    this.rotate = random(0,360)
                 }
                 make(){
                     fill(255,0,0)
+                    translate(width/2,height/2)
+                    rotate(this.rotate)
                     ellipse(this.x,this.y,75)
                     fill(255)
                     ellipse(this.x - 37.5,this.y + 37.5,37.5)
                     ellipse(this.x + 37.5,this.y + 37.5,37.5)
                 }
                 movement(){
-                    this.x += moveX
-                    this.y += moveY
+                    this.x += this.moveX
+                    this.y += this.moveY
                     if (this.x > width - 25 || this.x < 25){
-                        moveX *= -1
+                        this.moveX *= random(-0.8,-1.2)
                     }
                     if (this.y > height - 25 || this.y < 25){
-                        moveY *= -1
+                        this.moveY *= random(-0.8,-1.2)
                     }
                 }
             }
-            var moveX = 5
-            var moveY = 5
             var molecules = []
             function setup() {
+                angleMode(DEGREES)
                 createCanvas(800, 600);
-                molecules.push(new water(random(50,width-50),random(50,height - 50)))
-                molecules.push(new water(random(50,width-50),random(50,height - 50)))
+                for (var i = 0;i < 10;i++){
+                    molecules.push(new water(random(50,width-50),random(50,height - 50)))
+                }
             }
 
             function draw() {

@@ -59,8 +59,7 @@
                     }
                 }
             }
-            var initial;
-            var temperature;
+            var temperature = 25
             var molecules = []
             function setup() {
                 angleMode(DEGREES)
@@ -68,8 +67,6 @@
                 for (var i = 0;i < 10;i++){
                     molecules.push(new water(random(50,width-50),random(height/2 + 31.25,height - 50)))
                 }
-                initial = 25
-                temperature = initial
             }
 
             function draw() {
@@ -81,7 +78,7 @@
                 fill(100,100,255)
                 rect(0, height/2, width)
                 if (frameCount % 5 == 0 && frameCount > 30){
-                    initial++
+                    temperature++
                 }
                 for (var i = 0;i < molecules.length;i++){
                     molecules[i].make()

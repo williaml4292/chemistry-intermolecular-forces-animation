@@ -33,12 +33,15 @@
                     this.counter = 0;
                 }
                 make(){
-                    if (random(probability) < 75 && this.counter == 0){
+                    if (random(probability) > 90 && random(probability) > 90 && random(probability) > 90 && this.counter == 0){
                         this.state = "liquid"
+                        this.counter++
                     }
-                    else{
+                    else if  (this.counter == 1){
                         this.counter++
                         this.state = "gas"
+                        this.moveX = random(-10,-10)
+                        this.moveY = random(-10,10)
                     }
                     if (this.state == "liquid"){
                         fill(255,0,0)
@@ -51,9 +54,13 @@
                         fill(255)
                         ellipse(this.x,height-this.y + 31.25,31.25)
                         ellipse(this.x,height-this.y,31.25)
-                        fill(255,0,0)
-                        ellipse(this.x+100,height-this.y, 62.5)
-                        ellipse(this.x+162.5,height-this.y, 62.5)
+                        counterGas++
+                        if (counterGas == 2){
+                            fill(255,0,0)
+                            ellipse(this.x+100,height-this.y, 62.5)
+                            ellipse(this.x+162.5,height-this.y, 62.5)
+                            counterGas = 0
+                        }
                     }
                 }
                 movement(){
@@ -61,17 +68,28 @@
                     this.y += this.moveY
                     if (this.x > width - 25 || this.x < 25){
                         this.multiX = random(-0.8,-1.2)
-                        if (this.multiX > -0.4 && this.multiX < 0.4){
-                            this.multiX = random(-0.8,-1.2)
-                        }
+                        // if (this.multiX > -0.4 && this.multiX < 0.4){
+                        //     this.multiX = random(-0.8,-1.2)
+                        // }
                         this.moveX *= this.multiX
                     }
-                    if (this.y > height - 31.25 || this.y < height/2 + 25){
-                        this.multiY = random(-0.8,-1.2)
-                        if (this.multiY > -0.4 && this.multiY < 0.4){
-                            this.multiY = random(-0.8, -1.2)
+                    if (this.state == "liquid"){
+                        if (this.y > height - 31.25 || this.y < height/2 + 25){
+                            this.multiY = random(-0.8,-1.2)
+                            // if (this.multiY > -0.4 && this.multiY < 0.4){
+                            //     this.multiY = random(-0.8, -1.2)
+                            // }
+                            this.moveY *= this.multiY
                         }
-                        this.moveY *= this.multiY
+                    }
+                    else{
+                        if (this.y > height/2 || this.y < 0){
+                            this.multiY = random(-0.8,-1.2)
+                            // if (this.multiY > -0.4 && this.multiY < 0.4){
+                            //     this.multiY = random(-0.8, -1.2)
+                            // }
+                            this.moveY *= this.multiY
+                        }
                     }
                 }
             }
@@ -79,6 +97,7 @@
             var temperature;
             var molecules = []
             var probability;
+            var counterGas = 0;
             function setup() {
                 angleMode(DEGREES)
                 createCanvas(800, 600);

@@ -17,10 +17,17 @@
         <!-- HTML -->
 
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
         <script>
             // JS
+
+            // Aliases for convenience
+            const { Engine, World, Bodies, Runner, Composite } = Matter;
+
+            let engine, world, box;
+
             class water{
                 constructor(x,y){
                     this.x = x
@@ -61,11 +68,17 @@
             }
             var molecules = []
             function setup() {
+                Matter.Engine.create() 
+                world = engine.world;
+
                 angleMode(DEGREES)
                 createCanvas(800, 600);
                 for (var i = 0;i < 10;i++){
                     molecules.push(new water(random(50,width-50),random(height/2 + 50,height - 50)))
                 }
+
+                Runner.run(engine);
+                
             }
 
             function draw() {

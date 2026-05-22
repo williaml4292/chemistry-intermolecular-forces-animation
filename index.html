@@ -35,14 +35,14 @@
                 constructor(x, y) {
                     this.state = "liquid";
                     this.counter = 0;
-
                     this.body = Bodies.circle(x, y, 30, {
                         restitution: 0.8,
                         friction: 0,
                         frictionStatic: 0,
+                        frictionAir: 0,
                         collisionFilter: {
                             category: LIQUID,
-                            mask: WALL | LIQUID
+                            mask: WALL | LIQUID | GAS
                         }
                     });
 
@@ -58,9 +58,8 @@
                     if (random(probability) > 90 && random(probability) > 90 && random(probability) > 90 && this.counter == 0) {
                         this.state = "liquid";
                         this.counter++;
-
                         this.body.collisionFilter.category = LIQUID;
-                        this.body.collisionFilter.mask = WALL | LIQUID;
+                        this.body.collisionFilter.mask = WALL | LIQUID | GAS;
                     }
                     else if (this.counter == 1) {
                         this.counter++;
@@ -72,9 +71,9 @@
                         });
 
                         this.body.collisionFilter.category = GAS;
-                        this.body.collisionFilter.mask = WALL | GAS;
+                        this.body.collisionFilter.mask = WALL | LIQUID | GAS;
 
-                        this.body.frictionAir = 0.005;
+                        // this.body.frictionAir = 0.005;
                     }
                 }
 
@@ -93,9 +92,18 @@
                         ellipse(-31.25, 31.25, 31.25);
                         ellipse(31.25, 31.25, 31.25);
                     } else {
+                        counterGas++
+                        // O2
+                        if(counterGas == 2){
+                            counterGas = 0;
+                            fill(255, 0, 0)
+                            ellipse(0, -150, 62.5)
+                            ellipse(-62.5, -150 ,62.5)
+                        }
+                        // H2
                         fill(255);
-                        ellipse(0, 0, 31.25);
-                        ellipse(0, -31.25, 31.25);
+                        ellipse(121.25, 31.25, 31.25);
+                        ellipse(90, 31.25, 31.25);
                     }
 
                     pop();
@@ -105,9 +113,9 @@
                     if (!this.body || !this.body.velocity) return;
 
                     if (this.state == "liquid") {
-                        this.body.frictionAir = 0.05;
+                        // this.body.frictionAir = 0.05;
                     } else if (this.state == "gas") {
-                        this.body.frictionAir = 0.001;
+                        // this.body.frictionAir = 0.001;
 
                         Matter.Body.applyForce(this.body, this.body.position, {
                             x: (Math.random() - 0.5) * 0.0005,
@@ -164,6 +172,12 @@
                         collisionFilter: { category: WALL, mask: LIQUID | GAS }
                     })
                 ]);
+
+                engine.world.bounds = {
+                    min: { x: 0, y: 0 },
+                    max: { x: width, y: height }
+                };
+                
 
                 Runner.run(engine);
             }

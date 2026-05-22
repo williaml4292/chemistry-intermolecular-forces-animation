@@ -24,124 +24,154 @@
             // JS
 
             // Aliases for convenience
-            const { Engine, World, Bodies, Runner, Composite } = Matter;
+            let Engine = Matter.Engine,
+                World = Matter.World,
+                Bodies = Matter.Bodies,
+                Runner = Matter.Runner;
 
-            let engine, world, box;
+            let engine;
+            let world;
 
-            class water{
-                constructor(x,y){
-                    this.x = x
-                    this.y = y
-                    this.moveX = random(-10,-10)
-                    this.moveY = random(-10,10)
-                    this.multiX;
-                    this.multiY;
-                    this.state = "liquid"
+            class water {
+                constructor(x, y) {
+                    this.state = "liquid";
                     this.counter = 0;
+
+                    this.body = Bodies.circle(x, y, 30, {
+                        restitution: 0.8,
+                        frictionAir: 0,
+                        frictionStatic: 0,
+                        friction: 0
+                    });
+
+                    World.add(world, this.body);
                 }
-                make(){
-                    if (random(probability) > 90 && random(probability) > 90 && random(probability) > 90 && this.counter == 0){
-                        this.state = "liquid"
-                        this.counter++
+
+                make() {
+                    if (random(probability) > 90 && random(probability) > 90 && random(probability) > 90 && this.counter == 0) {
+                        this.state = "liquid";
+                        this.counter++;
                     }
-                    else if  (this.counter == 1){
-                        this.counter++
-                        this.state = "gas"
-                        this.moveX = random(-10,-10)
-                        this.moveY = random(-10,10)
-                    }
-                    if (this.state == "liquid"){
-                        fill(255,0,0)
-                        ellipse(this.x,this.y,62.5)
-                        fill(255)
-                        ellipse(this.x - 31.25,this.y + 31.25,31.25)
-                        ellipse(this.x + 31.25,this.y + 31.25,31.25)
-                    }
-                    else{
-                        fill(255)
-                        ellipse(this.x,height-this.y + 31.25,31.25)
-                        ellipse(this.x,height-this.y,31.25)
-                        counterGas++
-                        if (counterGas == 2){
-                            fill(255,0,0)
-                            ellipse(this.x+100,height-this.y, 62.5)
-                            ellipse(this.x+162.5,height-this.y, 62.5)
-                            counterGas = 0
-                        }
+                    else if (this.counter == 1) {
+                        this.counter++;
+                        this.state = "gas";
+
+                        Matter.Body.setVelocity(this.body, {
+                            x: random(-10, 10),
+                            y: random(-10, 10)
+                        });
                     }
                 }
-                movement(){
-                    this.x += this.moveX
-                    this.y += this.moveY
-                    if (this.x > width - 25 || this.x < 25){
-                        this.multiX = random(-0.8,-1.2)
-                        // if (this.multiX > -0.4 && this.multiX < 0.4){
-                        //     this.multiX = random(-0.8,-1.2)
-                        // }
-                        this.moveX *= this.multiX
+
+                show() {
+                    let pos = this.body.position;
+
+                    push();
+                    translate(pos.x, pos.y);
+
+                    if (this.state === "liquid") {
+                        fill(255, 0, 0);
+                        ellipse(0, 0, 62.5);
+                        fill(255);
+                        ellipse(-31.25, 31.25, 31.25);
+                        ellipse(31.25, 31.25, 31.25);
+                    } else {
+                        fill(255);
+                        ellipse(0, 0, 31.25);
+                        ellipse(0, -31.25, 31.25);
                     }
-                    if (this.state == "liquid"){
-                        if (this.y > height - 31.25 || this.y < height/2 + 25){
-                            this.multiY = random(-0.8,-1.2)
-                            // if (this.multiY > -0.4 && this.multiY < 0.4){
-                            //     this.multiY = random(-0.8, -1.2)
-                            // }
-                            this.moveY *= this.multiY
-                        }
-                    }
-                    else{
-                        if (this.y > height/2 || this.y < 0){
-                            this.multiY = random(-0.8,-1.2)
-                            // if (this.multiY > -0.4 && this.multiY < 0.4){
-                            //     this.multiY = random(-0.8, -1.2)
-                            // }
-                            this.moveY *= this.multiY
-                        }
-                    }
+
+                    pop();
+                }
+
+                // apply forces/velocities
+                movement() {
+                    if (!this.body || !this.body.velocity) return;  // prevent crashes
+
+                    let pos = this.body.position;
+                    let vel = this.body.velocity;
+
+                    // if (this.state === "liquid") {
+                    //     if (pos.y > height - 31.25 || pos.y < height / 2 + 25) {
+                    //         Matter.Body.setVelocity(this.body, {
+                    //             x: vel.x,
+                    //             y: -vel.y
+                    //         });
+                    //     }
+                    // } else {
+                    //     // for liquid
+                    //     if (pos.y > height / 2 || pos.y < 0 && this.state == "liquid") {
+                    //         Matter.Body.setVelocity(this.body, {
+                    //             x: vel.x,
+                    //             y: -vel.y
+                    //         });
+                    //     }
+                    //     // for gas
+                    //     else if (pos.y < 0 || pos.y > height){
+                    //         Matter.Body.setVelocity(this.body, {
+                    //             x: vel.x,
+                    //             y: -vel.y
+                    //         }); 
+                    //     }
+                    // }
                 }
             }
-            var initial = 25
+
+
+            var initial = 25;
             var temperature;
-            var molecules = []
+            var molecules = [];
             var probability;
             var counterGas = 0;
             function setup() {
-                Matter.Engine.create() 
+                engine = Engine.create();
                 world = engine.world;
-
+                engine.gravity.scale = 0;
+                
                 angleMode(DEGREES)
+
+                // create the molecules
                 createCanvas(800, 600);
-                for (var i = 0;i < 10;i++){
+                for (var i = 0; i < 10; i++){
                     molecules.push(new water(random(50,width-50),random(height/2 + 31.25,height - 50)))
                 }
 
-                Runner.run(engine);
-                
+                // walls to bounce off of
+                let walls = { isStatic: true };
+                    World.add(world, [
+                        Bodies.rectangle(width/2, height, width, 40, walls),
+                        Bodies.rectangle(width/2, 0, width, 40, walls),
+                        Bodies.rectangle(0, height/2, 40, height, walls),
+                        Bodies.rectangle(width, height/2, 40, height, walls)
+                    ]
+                );
+
+                Runner.run(engine);  
             }
 
             function draw() {
-                temperature = initial + " °C"
-                probability = frameCount/4
-                console.log(probability)
-                background(200,200,255)
-                fill(255,100,100)
-                textSize(50)
-                text(temperature,25,50)
-                fill(255,100,100)
-                textSize(50)
-                text(temperature,25,50)
-                // text(degrees, 85, 50)
-                fill(100,100,255)
-                rect(0, height/2, width)
-                if (frameCount % 5 == 0 && frameCount > 30){
-                    initial++
+                temperature = initial + " °C";
+                probability = frameCount / 4;
+
+                background(200, 200, 255);
+
+                fill(255, 100, 100);
+                textSize(50);
+                text(temperature, 25, 50);
+
+                fill(100, 100, 255);
+                rect(0, height / 2, width);
+
+                if (frameCount % 5 == 0 && frameCount > 30) {
+                    initial++;
                 }
+
                 for (var i = 0;i < molecules.length;i++){
-                    molecules[i].make()
-                    molecules[i].movement()
+                    molecules[i].make();
+                    molecules[i].movement();
+                    molecules[i].show();
                 }
             }
-
         </script>
     </body>
 </html>

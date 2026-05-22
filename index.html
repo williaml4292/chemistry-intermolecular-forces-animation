@@ -38,12 +38,15 @@
                     this.counter = 0;
 
                     this.body = Bodies.circle(x, y, 30, {
-                        restitution: 0.8,
-                        frictionAir: 0,
-                        frictionStatic: 0,
-                        friction: 0
+                        restitution: 0.8, // bouncy
+                        frictionAir: 0.05, // thicker movement for liquid
+                        friction: 0,
+                        frictionStatic: 0
                     });
-
+                    Matter.Body.setVelocity(this.body, {
+                        x: random(-5, 5),
+                        y: random(-5, 5)
+                    });
                     World.add(world, this.body);
                 }
 
@@ -56,18 +59,22 @@
                         this.counter++;
                         this.state = "gas";
 
+                        // make gas faster initially
                         Matter.Body.setVelocity(this.body, {
                             x: random(-10, 10),
                             y: random(-10, 10)
                         });
+                        this.body.frictionAir = 0.005; // make gas less viscous
                     }
                 }
 
                 show() {
                     let pos = this.body.position;
+                    let angle = this.body.angle;
 
                     push();
                     translate(pos.x, pos.y);
+                    rotate(this.body.angle);
 
                     if (this.state === "liquid") {
                         fill(255, 0, 0);
@@ -86,34 +93,27 @@
 
                 // apply forces/velocities
                 movement() {
-                    if (!this.body || !this.body.velocity) return;  // prevent crashes
+                    if (!this.body || !this.body.velocity) {
+                        return;  // prevent crashes
+                    }
 
                     let pos = this.body.position;
                     let vel = this.body.velocity;
 
-                    // if (this.state === "liquid") {
-                    //     if (pos.y > height - 31.25 || pos.y < height / 2 + 25) {
-                    //         Matter.Body.setVelocity(this.body, {
-                    //             x: vel.x,
-                    //             y: -vel.y
-                    //         });
-                    //     }
-                    // } else {
-                    //     // for liquid
-                    //     if (pos.y > height / 2 || pos.y < 0 && this.state == "liquid") {
-                    //         Matter.Body.setVelocity(this.body, {
-                    //             x: vel.x,
-                    //             y: -vel.y
-                    //         });
-                    //     }
-                    //     // for gas
-                    //     else if (pos.y < 0 || pos.y > height){
-                    //         Matter.Body.setVelocity(this.body, {
-                    //             x: vel.x,
-                    //             y: -vel.y
-                    //         }); 
-                    //     }
-                    // }
+                    // liquid
+                    if (this.state == "liquid") {
+                        this.body.frictionAir = 0.05; // slower if liquid
+
+                    // gas
+                    } else if (this.state == "gas") {
+                        this.body.frictionAir = 0.001; // faster if gas
+
+                        // make gas movement more chaotic
+                        Matter.Body.applyForce(this.body, this.body.position, {
+                            x: (Math.random() - 0.5) * 0.0005,
+                            y: (Math.random() - 0.5) * 0.0005
+                        });
+                    }
                 }
             }
 
@@ -139,10 +139,10 @@
                 // walls to bounce off of
                 let walls = { isStatic: true };
                     World.add(world, [
-                        Bodies.rectangle(width/2, height, width, 40, walls),
-                        Bodies.rectangle(width/2, 0, width, 40, walls),
-                        Bodies.rectangle(0, height/2, 40, height, walls),
-                        Bodies.rectangle(width, height/2, 40, height, walls)
+                        Bodies.rectangle(width/2, height+20, width, 40, walls), // bottom
+                        Bodies.rectangle(width/2, -20, width, 40, walls), // top
+                        Bodies.rectangle(-20, height/2, 40, height, walls), // left
+                        Bodies.rectangle(width+20, height/2, 40, height, walls) // right
                     ]
                 );
 

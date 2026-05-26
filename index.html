@@ -206,8 +206,8 @@
 
                     if (this.state === "gas") {
                         fill(255);
-                        ellipse(-15.625, 31.25, 31.25);
-                        ellipse(15.625, 31.25, 31.25);
+                        ellipse(-15.625, 0, 31.25);
+                        ellipse(15.625, 0, 31.25);
                     } 
                     // else {
                     //     counterGas++
@@ -317,9 +317,9 @@
                     rotate(this.body.angle);
 
                     if (this.state === "gas") {
-                        fill(255);
-                        ellipse(-31.25, 31.25, 31.25);
-                        ellipse(31.25, 31.25, 31.25);
+                        fill(255, 0, 0);
+                        ellipse(-31.25, 0, 62.5);
+                        ellipse(31.25, 0, 62.5);
                     } 
                     // else {
                     //     counterGas++
@@ -426,6 +426,26 @@
                 Engine.update(engine, 1000 / 60); // matter js framerate
 
                 Runner.run(engine);
+
+                Matter.Events.on(engine, "collisionStart", event => {
+                    for (const pair of event.pairs) {
+                        const A = pair.bodyA;
+                        const B = pair.bodyB;
+
+                        // Only react if both are water molecules
+                        if (A.label === "water" && B.label === "water") {
+
+                            const vA = A.velocity;
+                            const vB = B.velocity;
+
+                            const relCollisionSpeed = Math.hypot(vA.x - vB.x, vA.y - vB.y);
+
+                            if (relCollisionSpeed > 8) {
+                                triggerReaction(A.parentObject, B.parentObject);
+                            }
+                        }
+                    }
+                });
             }
 
             function draw() {
@@ -460,31 +480,20 @@
                 World.remove(world, w1.body);
                 World.remove(world, w2.body);
 
-                // Remove from your array
+                // Remove from array
                 molecules = molecules.filter(m => m !== w1 && m !== w2);
 
-                // Create gas molecules
+                // Position for new molecules
                 let pos = w1.body.position;
 
-                // O2 (bigger)
-                let O2 = Bodies.circle(pos.x, pos.y, 45, {
-                    label: "gas",
-                    collisionFilter: { category: GAS, mask: WALL | GAS | LIQUID }
-                });
+                // Create new gas molecules using your classes
+                let newO2 = new o2(pos.x, pos.y);
+                let newH2 = new h2(pos.x + 80, pos.y);
 
-                // H2 (smaller)
-                let H2 = Bodies.circle(pos.x + 80, pos.y, 20, {
-                    label: "gas",
-                    collisionFilter: { category: GAS, mask: WALL | GAS | LIQUID }
-                });
-
-                // Add to world
-                World.add(world, [O2, H2]);
-
-                // Add to your molecule list if needed
-                molecules.push(newGasWrapper(O2, "O2"));
-                molecules.push(newGasWrapper(H2, "H2"));
+                molecules.push(newO2);
+                molecules.push(newH2);
             }
+
 
             
         </script>

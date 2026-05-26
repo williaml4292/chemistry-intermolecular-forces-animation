@@ -51,6 +51,11 @@
                         y: (Math.random() * 10) - 5
                     });
 
+                    // for matter js collisions
+                    this.body.label = "water";
+                    this.body.parentObject = this; // link back to the class instance
+
+
                     World.add(world, this.body);
                 }
 
@@ -91,20 +96,328 @@
                         fill(255);
                         ellipse(-31.25, 31.25, 31.25);
                         ellipse(31.25, 31.25, 31.25);
-                    } else {
+                    } 
+                    // else {
+                    //     counterGas++
+                    //     // O2
+                    //     if(counterGas == 2){
+                    //         counterGas = 0;
+                    //         fill(255, 0, 0)
+                    //         ellipse(0, -150, 62.5)
+                    //         ellipse(-62.5, -150 ,62.5)
+                    //     }
+                    //     // H2
+                    //     fill(255);
+                    //     ellipse(121.25, 31.25, 31.25);
+                    //     ellipse(90, 31.25, 31.25);
+                    // }
+                    else if (this.type === "O2") {
                         counterGas++
-                        // O2
                         if(counterGas == 2){
                             counterGas = 0;
                             fill(255, 0, 0)
                             ellipse(0, -150, 62.5)
                             ellipse(-62.5, -150 ,62.5)
                         }
-                        // H2
+                    } else if (this.type === "H2") {
+                        counterGas++
                         fill(255);
                         ellipse(121.25, 31.25, 31.25);
                         ellipse(90, 31.25, 31.25);
                     }
+
+                    // collision check to turn to gas
+                    Matter.Events.on(engine, "collisionStart", event => {
+                        for (let pair of event.pairs) {
+                            let A = pair.bodyA;
+                            let B = pair.bodyB;
+
+                            // Only react if both are water molecules
+                            if (A.label == "water" && B.label == "water") {
+
+                                // Compute relative speed
+                                let vA = A.velocity;
+                                let vB = B.velocity;
+                                let relCollisionSpeed = Math.sqrt(((vA.x - vB.x) ** 2) + ((vA.y - vB.y) ** 2)); // calculate collision speed
+                                // let relSpeed = dist(vA.x, vA.y, vB.x, vB.y);
+
+                                // Threshold for reaction
+                                if (relCollisionSpeed > 8) {
+                                    triggerReaction(A.parentObject, B.parentObject);
+                                }
+                            }
+                        }
+                    });
+
+                    pop();
+                }
+
+                movement() {
+                    if (!this.body || !this.body.velocity) return;
+
+                    if (this.state == "liquid") {
+                        // this.body.frictionAir = 0.05;
+                    } else if (this.state == "gas") {
+                        // this.body.frictionAir = 0.001;
+
+                        Matter.Body.applyForce(this.body, this.body.position, {
+                            x: (Math.random() - 0.5) * 0.0005,
+                            y: (Math.random() - 0.5) * 0.0005
+                        });
+                    }
+                }
+            }
+
+            class h2 {
+                constructor(x, y) {
+                    this.state = "gas";
+                    this.counter = 0;
+                    this.body = Bodies.circle(x, y, 15, {
+                        restitution: 0.8,
+                        friction: 0,
+                        frictionStatic: 0,
+                        frictionAir: 0,
+                        collisionFilter: {
+                            category: GAS,
+                            mask: WALL | LIQUID | GAS
+                        }
+                    });
+
+                    Matter.Body.setVelocity(this.body, {
+                        x: (Math.random() * 10),
+                        y: (Math.random() * 10)
+                    });
+
+                    // for matter js collisions
+                    this.body.label = "gas";
+                    this.body.parentObject = this; // link back to the class instance
+
+
+                    World.add(world, this.body);
+                }
+
+                make() {
+                //     if (random(probability) > 90 && random(probability) > 90 && random(probability) > 90 && this.counter == 0) {
+                //         this.state = "liquid";
+                //         this.counter++;
+                //         this.body.collisionFilter.category = LIQUID;
+                //         this.body.collisionFilter.mask = WALL | LIQUID | GAS;
+                //     }
+                //     else if (this.counter == 1) {
+                //         this.counter++;
+                //         this.state = "gas";
+
+                //         Matter.Body.setVelocity(this.body, {
+                //             x: random(-10, 10),
+                //             y: random(-10, 10)
+                //         });
+
+                //         this.body.collisionFilter.category = GAS;
+                //         this.body.collisionFilter.mask = WALL | LIQUID | GAS;
+
+                //         // this.body.frictionAir = 0.005;
+                //     }
+                }
+
+                show() {
+                    let pos = this.body.position;
+                    let angle = this.body.angle;
+
+                    push();
+                    translate(pos.x, pos.y);
+                    rotate(this.body.angle);
+
+                    if (this.state === "gas") {
+                        fill(255);
+                        ellipse(-15.625, 31.25, 31.25);
+                        ellipse(15.625, 31.25, 31.25);
+                    } 
+                    // else {
+                    //     counterGas++
+                    //     // O2
+                    //     if(counterGas == 2){
+                    //         counterGas = 0;
+                    //         fill(255, 0, 0)
+                    //         ellipse(0, -150, 62.5)
+                    //         ellipse(-62.5, -150 ,62.5)
+                    //     }
+                    //     // H2
+                    //     fill(255);
+                    //     ellipse(121.25, 31.25, 31.25);
+                    //     ellipse(90, 31.25, 31.25);
+                    // }
+                    // else if (this.type === "O2") {
+                    //     counterGas++
+                    //     if(counterGas == 2){
+                    //         counterGas = 0;
+                    //         fill(255, 0, 0)
+                    //         ellipse(0, -150, 62.5)
+                    //         ellipse(-62.5, -150 ,62.5)
+                    //     }
+                    // } else if (this.type === "H2") {
+                    //     counterGas++
+                    //     fill(255);
+                    //     ellipse(121.25, 31.25, 31.25);
+                    //     ellipse(90, 31.25, 31.25);
+                    // }
+
+                    // collision check to turn to gas
+                    Matter.Events.on(engine, "collisionStart", event => {
+                        for (let pair of event.pairs) {
+                            let A = pair.bodyA;
+                            let B = pair.bodyB;
+
+                            // Only react if both are water molecules
+                            if (A.label == "water" && B.label == "water") {
+
+                                // Compute relative speed
+                                let vA = A.velocity;
+                                let vB = B.velocity;
+                                let relCollisionSpeed = Math.sqrt(((vA.x - vB.x) ** 2) + ((vA.y - vB.y) ** 2)); // calculate collision speed
+                                // let relSpeed = dist(vA.x, vA.y, vB.x, vB.y);
+
+                                // Threshold for reaction
+                                if (relCollisionSpeed > 8) {
+                                    triggerReaction(A.parentObject, B.parentObject);
+                                }
+                            }
+                        }
+                    });
+
+                    pop();
+                }
+
+                movement() {
+                    if (!this.body || !this.body.velocity) return;
+
+                    if (this.state == "liquid") {
+                        // this.body.frictionAir = 0.05;
+                    } else if (this.state == "gas") {
+                        // this.body.frictionAir = 0.001;
+
+                        Matter.Body.applyForce(this.body, this.body.position, {
+                            x: (Math.random() - 0.5) * 0.0005,
+                            y: (Math.random() - 0.5) * 0.0005
+                        });
+                    }
+                }
+            }
+
+            class o2 {
+                constructor(x, y) {
+                    this.state = "gas";
+                    this.counter = 0;
+                    this.body = Bodies.circle(x, y, 30, {
+                        restitution: 0.8,
+                        friction: 0,
+                        frictionStatic: 0,
+                        frictionAir: 0,
+                        collisionFilter: {
+                            category: GAS,
+                            mask: WALL | LIQUID | GAS
+                        }
+                    });
+
+                    Matter.Body.setVelocity(this.body, {
+                        x: (Math.random() * 10),
+                        y: (Math.random() * 10)
+                    });
+
+                    // for matter js collisions
+                    this.body.label = "gas";
+                    this.body.parentObject = this; // link back to the class instance
+
+
+                    World.add(world, this.body);
+                }
+
+                make() {
+                //     if (random(probability) > 90 && random(probability) > 90 && random(probability) > 90 && this.counter == 0) {
+                //         this.state = "liquid";
+                //         this.counter++;
+                //         this.body.collisionFilter.category = LIQUID;
+                //         this.body.collisionFilter.mask = WALL | LIQUID | GAS;
+                //     }
+                //     else if (this.counter == 1) {
+                //         this.counter++;
+                //         this.state = "gas";
+
+                //         Matter.Body.setVelocity(this.body, {
+                //             x: random(-10, 10),
+                //             y: random(-10, 10)
+                //         });
+
+                //         this.body.collisionFilter.category = GAS;
+                //         this.body.collisionFilter.mask = WALL | LIQUID | GAS;
+
+                //         // this.body.frictionAir = 0.005;
+                //     }
+                }
+
+                show() {
+                    let pos = this.body.position;
+                    let angle = this.body.angle;
+
+                    push();
+                    translate(pos.x, pos.y);
+                    rotate(this.body.angle);
+
+                    if (this.state === "gas") {
+                        fill(255);
+                        ellipse(-31.25, 31.25, 31.25);
+                        ellipse(31.25, 31.25, 31.25);
+                    } 
+                    // else {
+                    //     counterGas++
+                    //     // O2
+                    //     if(counterGas == 2){
+                    //         counterGas = 0;
+                    //         fill(255, 0, 0)
+                    //         ellipse(0, -150, 62.5)
+                    //         ellipse(-62.5, -150 ,62.5)
+                    //     }
+                    //     // H2
+                    //     fill(255);
+                    //     ellipse(121.25, 31.25, 31.25);
+                    //     ellipse(90, 31.25, 31.25);
+                    // }
+                    // else if (this.type === "O2") {
+                    //     counterGas++
+                    //     if(counterGas == 2){
+                    //         counterGas = 0;
+                    //         fill(255, 0, 0)
+                    //         ellipse(0, -150, 62.5)
+                    //         ellipse(-62.5, -150 ,62.5)
+                    //     }
+                    // } else if (this.type === "H2") {
+                    //     counterGas++
+                    //     fill(255);
+                    //     ellipse(121.25, 31.25, 31.25);
+                    //     ellipse(90, 31.25, 31.25);
+                    // }
+
+                    // collision check to turn to gas
+                    Matter.Events.on(engine, "collisionStart", event => {
+                        for (let pair of event.pairs) {
+                            let A = pair.bodyA;
+                            let B = pair.bodyB;
+
+                            // Only react if both are water molecules
+                            if (A.label == "water" && B.label == "water") {
+
+                                // Compute relative speed
+                                let vA = A.velocity;
+                                let vB = B.velocity;
+                                let relCollisionSpeed = Math.sqrt(((vA.x - vB.x) ** 2) + ((vA.y - vB.y) ** 2)); // calculate collision speed
+                                // let relSpeed = dist(vA.x, vA.y, vB.x, vB.y);
+
+                                // Threshold for reaction
+                                if (relCollisionSpeed > 8) {
+                                    triggerReaction(A.parentObject, B.parentObject);
+                                }
+                            }
+                        }
+                    });
 
                     pop();
                 }
@@ -178,6 +491,8 @@
                     max: { x: width, y: height }
                 };
                 
+                frameRate(60); // p5js framerate
+                Engine.update(engine, 1000 / 60); // matter js framerate
 
                 Runner.run(engine);
             }
@@ -185,7 +500,7 @@
             function draw() {
                 temperature = initial + " °C";
 
-                /* FIXED: probability runaway */
+                // FIXED: probability runaway
                 probability = min(frameCount / 4, 500);
 
                 background(200, 200, 255);
@@ -207,6 +522,40 @@
                     molecules[i].show();
                 }
             }
+            
+            // runs on sucessful collsion
+            function triggerReaction(w1, w2) {
+                // Remove old bodies
+                World.remove(world, w1.body);
+                World.remove(world, w2.body);
+
+                // Remove from your array
+                molecules = molecules.filter(m => m !== w1 && m !== w2);
+
+                // Create gas molecules
+                let pos = w1.body.position;
+
+                // O2 (bigger)
+                let O2 = Bodies.circle(pos.x, pos.y, 45, {
+                    label: "gas",
+                    collisionFilter: { category: GAS, mask: WALL | GAS | LIQUID }
+                });
+
+                // H2 (smaller)
+                let H2 = Bodies.circle(pos.x + 80, pos.y, 20, {
+                    label: "gas",
+                    collisionFilter: { category: GAS, mask: WALL | GAS | LIQUID }
+                });
+
+                // Add to world
+                World.add(world, [O2, H2]);
+
+                // Add to your molecule list if needed
+                molecules.push(newGasWrapper(O2, "O2"));
+                molecules.push(newGasWrapper(H2, "H2"));
+            }
+
+            
         </script>
     </body>
 </html>

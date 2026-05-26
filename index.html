@@ -126,29 +126,6 @@
                         ellipse(90, 31.25, 31.25);
                     }
 
-                    // collision check to turn to gas
-                    Matter.Events.on(engine, "collisionStart", event => {
-                        for (let pair of event.pairs) {
-                            let A = pair.bodyA;
-                            let B = pair.bodyB;
-
-                            // Only react if both are water molecules
-                            if (A.label == "water" && B.label == "water") {
-
-                                // Compute relative speed
-                                let vA = A.velocity;
-                                let vB = B.velocity;
-                                let relCollisionSpeed = Math.sqrt(((vA.x - vB.x) ** 2) + ((vA.y - vB.y) ** 2)); // calculate collision speed
-                                // let relSpeed = dist(vA.x, vA.y, vB.x, vB.y);
-
-                                // Threshold for reaction
-                                if (relCollisionSpeed > 8) {
-                                    triggerReaction(A.parentObject, B.parentObject);
-                                }
-                            }
-                        }
-                    });
-
                     pop();
                 }
 
@@ -261,29 +238,6 @@
                     //     ellipse(90, 31.25, 31.25);
                     // }
 
-                    // collision check to turn to gas
-                    Matter.Events.on(engine, "collisionStart", event => {
-                        for (let pair of event.pairs) {
-                            let A = pair.bodyA;
-                            let B = pair.bodyB;
-
-                            // Only react if both are water molecules
-                            if (A.label == "water" && B.label == "water") {
-
-                                // Compute relative speed
-                                let vA = A.velocity;
-                                let vB = B.velocity;
-                                let relCollisionSpeed = Math.sqrt(((vA.x - vB.x) ** 2) + ((vA.y - vB.y) ** 2)); // calculate collision speed
-                                // let relSpeed = dist(vA.x, vA.y, vB.x, vB.y);
-
-                                // Threshold for reaction
-                                if (relCollisionSpeed > 8) {
-                                    triggerReaction(A.parentObject, B.parentObject);
-                                }
-                            }
-                        }
-                    });
-
                     pop();
                 }
 
@@ -395,29 +349,6 @@
                     //     ellipse(121.25, 31.25, 31.25);
                     //     ellipse(90, 31.25, 31.25);
                     // }
-
-                    // collision check to turn to gas
-                    Matter.Events.on(engine, "collisionStart", event => {
-                        for (let pair of event.pairs) {
-                            let A = pair.bodyA;
-                            let B = pair.bodyB;
-
-                            // Only react if both are water molecules
-                            if (A.label == "water" && B.label == "water") {
-
-                                // Compute relative speed
-                                let vA = A.velocity;
-                                let vB = B.velocity;
-                                let relCollisionSpeed = Math.sqrt(((vA.x - vB.x) ** 2) + ((vA.y - vB.y) ** 2)); // calculate collision speed
-                                // let relSpeed = dist(vA.x, vA.y, vB.x, vB.y);
-
-                                // Threshold for reaction
-                                if (relCollisionSpeed > 8) {
-                                    triggerReaction(A.parentObject, B.parentObject);
-                                }
-                            }
-                        }
-                    });
 
                     pop();
                 }

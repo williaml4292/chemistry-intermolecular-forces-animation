@@ -47,8 +47,8 @@
                     });
 
                     Matter.Body.setVelocity(this.body, {
-                        x: (Math.random() * 10) - 5,
-                        y: (Math.random() * 10) - 5
+                        x: (Math.random() * 5) - 2.5,
+                        y: (Math.random() * 5) - 2.5
                     });
 
                     // for matter js collisions
@@ -149,7 +149,7 @@
                 constructor(x, y) {
                     this.state = "gas";
                     this.counter = 0;
-                    this.body = Bodies.circle(x, y, 15, {
+                    this.body = ellipseBody(x, y, 30, 15, 24, {
                         restitution: 0.8,
                         friction: 0,
                         frictionStatic: 0,
@@ -261,7 +261,7 @@
                 constructor(x, y) {
                     this.state = "gas";
                     this.counter = 0;
-                    this.body = Bodies.circle(x, y, 30, {
+                    this.body = ellipseBody(x, y, 60, 30, 24, {
                         restitution: 0.8,
                         friction: 0,
                         frictionStatic: 0,
@@ -369,6 +369,18 @@
                 }
             }
 
+            function ellipseBody(x, y, rx, ry, sides = 24, options = {}) {
+                const verts = [];
+                for (let i = 0; i < sides; i++) {
+                    const angle = (Math.PI * 2 * i) / sides;
+                    verts.push({
+                        x: x + rx * Math.cos(angle),
+                        y: y + ry * Math.sin(angle)
+                    });
+                }
+                return Matter.Bodies.fromVertices(x, y, verts, options, true);
+            }
+
             var initial = 25;
             var temperature;
             var molecules = [];
@@ -410,8 +422,8 @@
                     Bodies.rectangle(-50, height/2, 100, height, sideWalls),
                     Bodies.rectangle(width+50, height/2, 100, height, sideWalls),
 
-                    // middle divider (both collide)
-                    Bodies.rectangle(width/2, height/2, width, 40, {
+                    // middle wall
+                    Bodies.rectangle(width/2, height/2, width, 20, {
                         isStatic: true,
                         collisionFilter: { category: WALL, mask: LIQUID | GAS }
                     })
@@ -440,7 +452,7 @@
 
                             const relCollisionSpeed = Math.hypot(vA.x - vB.x, vA.y - vB.y);
 
-                            if (relCollisionSpeed > 8) {
+                            if (relCollisionSpeed > 15) {
                                 triggerReaction(A.parentObject, B.parentObject);
                             }
                         }
@@ -451,7 +463,6 @@
             function draw() {
                 temperature = initial + " °C";
 
-                // FIXED: probability runaway
                 probability = min(frameCount / 4, 500);
 
                 background(200, 200, 255);
@@ -468,9 +479,59 @@
                 }
 
                 for (var i = 0; i < molecules.length; i++){
-                    molecules[i].make();
-                    molecules[i].movement();
-                    molecules[i].show();
+                    let m = molecules[i];
+
+                    m.make();
+                    m.movement();
+
+                    // SLOW VELOCITY INCREASE
+                    let v = m.body.velocity;
+                    let speed = Math.sqrt(v.x*v.x + v.y*v.y);
+
+                    // add a constant amount to speed
+                    let newSpeed = speed + 0.05;
+
+                    // normalize direction
+                    let nx = v.x / speed;
+                    let ny = v.y / speed;
+
+                    // apply new velocity
+                    Matter.Body.setVelocity(m.body, {
+                        x: nx * newSpeed,
+                        y: ny * newSpeed
+                    });
+
+                    // H2 and O2 stay in TOP half
+                    if (m instanceof h2 || m instanceof o2) {
+                        if (m.body.position.y > height / 2) {
+                            Matter.Body.setPosition(m.body, {
+                                x: m.body.position.x,
+                                y: height / 2 - 10
+                            });
+                            // flip vertical velocity
+                            Matter.Body.setVelocity(m.body, {
+                                x: m.body.velocity.x,
+                                y: -m.body.velocity.y
+                            });
+                        }
+                    }
+
+                    // Water stays in BOTTOM half
+                    if (m instanceof water) {
+                        if (m.body.position.y < height / 2) {
+                            Matter.Body.setPosition(m.body, {
+                                x: m.body.position.x,
+                                y: height / 2 + 10
+                            });
+                            // flip vertical velocity
+                            Matter.Body.setVelocity(m.body, {
+                                x: m.body.velocity.x,
+                                y: -m.body.velocity.y
+                            });
+                        }
+                    }
+
+                    m.show();
                 }
             }
             

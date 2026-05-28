@@ -549,10 +549,12 @@
 
                 // Create new gas molecules using your classes
                 let newO2 = new o2(pos.x, pos.y);
-                let newH2 = new h2(pos.x + 80, pos.y);
+                let newH2_1st = new h2(pos.x + 80, pos.y);
+                let newH2_2nd = new h2(pos.x + 120, pos.y);
 
                 molecules.push(newO2);
-                molecules.push(newH2);
+                molecules.push(newH2_1st);
+                molecules.push(newH2_2nd);
             }
 
 

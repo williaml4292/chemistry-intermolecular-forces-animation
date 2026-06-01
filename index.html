@@ -24,9 +24,14 @@
                 Runner = Matter.Runner;
 
             let hydrogenBonds = [];
+            let molecules = [];
 
             let engine;
             let world;
+
+            let initial = 0;
+            let probability = 0;
+            let temperature = 0;
 
             // collision filters
             const LIQUID = 0x0001;
@@ -35,10 +40,9 @@
 
             class water {
                 constructor(x, y) {
-                    this.state = "liquid";
+                    this.state = "liquid";   // "liquid" or "gas"
                     this.counter = 0;
 
-                    
                     this.body = Bodies.circle(x, y, 30, {
                         restitution: 0.8,
                         friction: 0,
@@ -62,50 +66,46 @@
                 }
 
                 make() {
-
-                    //  liquid → gas trigger
+                    // liquid → gas trigger (you can later replace this with temperature logic)
                     if (
-                        random(probability) > 90 &&
-                        random(probability) > 90 &&
-                        random(probability) > 90 &&
-                        this.counter === 0
+                        random(probability) > 110 &&
+                        random(probability) > 110 &&
+                        random(probability) > 110 &&
+                        this.state === "liquid"
                     ) {
-                        this.counter++;
-                        this.state = "liquid"; // stays liquid until next frame
-                        return;
+                        this.becomeGas();
                     }
+                }
 
-                    else if (this.counter === 1) {
-                        this.counter++;
+                becomeGas() {
+                    this.state = "gas";
 
-                        for (let i = hydrogenBonds.length - 1; i >= 0; i--) {
-                            let bond = hydrogenBonds[i];
-                            if (bond.a === this || bond.b === this) {
-                                World.remove(world, bond.constraint);
-                                hydrogenBonds.splice(i, 1);
-                            }
+                    // remove all hgydrogen bonds connected to this molecule
+                    for (let i = hydrogenBonds.length - 1; i >= 0; i--) {
+                        let bond = hydrogenBonds[i];
+                        if (bond.a === this || bond.b === this) {
+                            World.remove(world, bond.constraint);
+                            hydrogenBonds.splice(i, 1);
                         }
-
-                        // Save position before deleting body
-                        let x = this.body.position.x;
-                        let y = this.body.position.y;
-
-                        // remove water molecule
-                        World.remove(world, this.body);
-                        molecules = molecules.filter(m => m !== this);
-
-                        // make H2 and O2
-                        let newO2 = new o2(x, y);
-                        let newH2_1 = new h2(x + 40, y);
-                        let newH2_2 = new h2(x - 40, y);
-
-                        molecules.push(newO2, newH2_1, newH2_2);
-
-                        return; // stop processing this deleted molecule
                     }
 
-                    // Normal movement
-                    this.movement();
+                    Matter.Body.setPosition(this.body, {
+                        x: this.body.position.x,
+                        y: random(50, height * 0.65 - 50)
+                    });
+
+                    // change collision category to GAS
+                    this.body.collisionFilter.category = GAS;
+                    this.body.collisionFilter.mask = WALL | LIQUID | GAS;
+
+                    // give it a gas‑like kick
+                    Matter.Body.setVelocity(this.body, {
+                        x: random(-3, 3),
+                        y: random(-3, 3)
+                    });
+
+                    // lighter drag for gas
+                    this.body.frictionAir = 0.001;
                 }
 
                 show() {
@@ -116,15 +116,14 @@
                     translate(pos.x, pos.y);
                     rotate(angle);
 
-                    if (this.state === "liquid") {
-                        // Draw H2O molecule
-                        fill(255, 0, 0); // Oxygen
-                        ellipse(0, 0, 62.5);
+                    
+                    // show molecule in p5js
+                    fill(255, 0, 0); // Oxygen
+                    ellipse(0, 0, 62.5);
 
-                        fill(255); // Hydrogens
-                        ellipse(-31.25, 31.25, 31.25);
-                        ellipse(31.25, 31.25, 31.25);
-                    }
+                    fill(255); // Hydrogens
+                    ellipse(-31.25, 31.25, 31.25);
+                    ellipse(31.25, 31.25, 31.25);
 
                     pop();
                 }
@@ -133,173 +132,17 @@
                     if (!this.body || !this.body.velocity) return;
 
                     if (this.state === "liquid") {
-                        // Optional: add viscosity here
-                    }
-                }
-            }
-
-            class h2 {
-                constructor(x, y) {
-                    this.state = "gas";
-                    this.counter = 0;
-                    this.body = ellipseBody(x, y, 30, 15, 24, {
-                        restitution: 0.8,
-                        friction: 0,
-                        frictionStatic: 0,
-                        frictionAir: 0,
-                        collisionFilter: {
-                            category: GAS,
-                            mask: WALL | LIQUID | GAS
-                        }
-                    });
-
-                    Matter.Body.setVelocity(this.body, {
-                        x: (Math.random() * 10),
-                        y: (Math.random() * 10)
-                    });
-
-                    // for matter js collisions
-                    this.body.label = "gas";
-                    this.body.parentObject = this; // link back to the class instance
-
-
-                    World.add(world, this.body);
-                }
-
-                make() {
-                //     if (random(probability) > 90 && random(probability) > 90 && random(probability) > 90 && this.counter == 0) {
-                //         this.state = "liquid";
-                //         this.counter++;
-                //         this.body.collisionFilter.category = LIQUID;
-                //         this.body.collisionFilter.mask = WALL | LIQUID | GAS;
-                //     }
-                //     else if (this.counter == 1) {
-                //         this.counter++;
-                //         this.state = "gas";
-
-                //         Matter.Body.setVelocity(this.body, {
-                //             x: random(-10, 10),
-                //             y: random(-10, 10)
-                //         });
-
-                //         this.body.collisionFilter.category = GAS;
-                //         this.body.collisionFilter.mask = WALL | LIQUID | GAS;
-
-                //         // this.body.frictionAir = 0.005;
-                //     }
-                }
-
-                show() {
-                    let pos = this.body.position;
-                    let angle = this.body.angle;
-
-                    push();
-                    translate(pos.x, pos.y);
-                    rotate(angle);
-
-                    fill(255); // white hydrogen atoms
-                    ellipse(-15.615, 0, 31.25);
-                    ellipse(15.615, 0, 31.25);
-
-                    pop();
-                }
-
-                movement() {
-                    if (!this.body || !this.body.velocity) return;
-
-                    if (this.state == "liquid") {
-                        // this.body.frictionAir = 0.05;
-                    } else if (this.state == "gas") {
-                        // this.body.frictionAir = 0.001;
-
+                        // optional: viscosity, damping, etc.
+                    } else if (this.state === "gas") {
+                        // tiny random jitter to keep gas moving
                         Matter.Body.applyForce(this.body, this.body.position, {
-                            x: (Math.random() - 0.5) * 0.0005,
-                            y: (Math.random() - 0.5) * 0.0005
+                            x: (Math.random() - 0.5) * 0.0003,
+                            y: (Math.random() - 0.5) * 0.0003
                         });
+                        Matter.Body
                     }
                 }
             }
-
-            class o2 {
-                constructor(x, y) {
-                    this.state = "gas";
-                    this.counter = 0;
-                    this.body = ellipseBody(x, y, 60, 30, 24, {
-                        restitution: 0.8,
-                        friction: 0,
-                        frictionStatic: 0,
-                        frictionAir: 0,
-                        collisionFilter: {
-                            category: GAS,
-                            mask: WALL | LIQUID | GAS
-                        }
-                    });
-
-                    Matter.Body.setVelocity(this.body, {
-                        x: (Math.random() * 10),
-                        y: (Math.random() * 10)
-                    });
-
-                    // for matter js collisions
-                    this.body.label = "gas";
-                    this.body.parentObject = this; // link back to the class instance
-
-
-                    World.add(world, this.body);
-                }
-
-                make() {
-                
-                }
-
-                show() {
-                    let pos = this.body.position;
-                    let angle = this.body.angle;
-
-                    push();
-                    translate(pos.x, pos.y);
-                    rotate(angle);
-
-                    fill(255, 0, 0); // red oxygen atoms
-                    ellipse(-31.25, 0, 62.5);
-                    ellipse(31.25, 0, 62.5);
-
-                    pop();
-                }
-
-                movement() {
-                    if (!this.body || !this.body.velocity) return;
-
-                    if (this.state == "liquid") {
-                        // this.body.frictionAir = 0.05;
-                    } else if (this.state == "gas") {
-                        // this.body.frictionAir = 0.001;
-
-                        Matter.Body.applyForce(this.body, this.body.position, {
-                            x: (Math.random() - 0.5) * 0.0005,
-                            y: (Math.random() - 0.5) * 0.0005
-                        });
-                    }
-                }
-            }
-
-            function ellipseBody(x, y, rx, ry, sides = 24, options = {}) {
-                const verts = [];
-                for (let i = 0; i < sides; i++) {
-                    const angle = (Math.PI * 2 * i) / sides;
-                    verts.push({
-                        x: x + rx * Math.cos(angle),
-                        y: y + ry * Math.sin(angle)
-                    });
-                }
-                return Matter.Bodies.fromVertices(x, y, verts, options, true);
-            }
-
-            var initial = 25;
-            var temperature;
-            var molecules = [];
-            var probability;
-            var counterGas = 0;
 
             function setup() {
                 engine = Engine.create();
@@ -308,14 +151,12 @@
 
                 createCanvas(800, 600);
 
-                for (var i = 0; i < 10; i++){
-                    molecules.push(new water(random(50,width-50),random(height/2 + 31.25,height - 50)))
+                for (let i = 0; i < 10; i++) {
+                    molecules.push(new water(
+                        random(50, width - 50),
+                        random(height * 0.65 + 31.25, height - 50)
+                    ));
                 }
-
-                let walls = {
-                    isStatic: true,
-                    collisionFilter: { category: WALL }
-                };
 
                 let sideWalls = {
                     isStatic: true,
@@ -323,21 +164,19 @@
                 };
 
                 World.add(world, [
-                    Bodies.rectangle(width/2, height+50, width, 100, {
+                    Bodies.rectangle(width / 2, height + 50, width, 100, {
                         isStatic: true,
                         collisionFilter: { category: WALL, mask: LIQUID | GAS}
                     }),
-                    Bodies.rectangle(width/2, -50, width, 100, {
+                    Bodies.rectangle(width / 2, -50, width, 100, {
                         isStatic: true,
                         collisionFilter: { category: WALL, mask: LIQUID | GAS }
                     }),
 
-                    // left + right walls (both states collide)
-                    Bodies.rectangle(-50, height/2, 100, height, sideWalls),
-                    Bodies.rectangle(width+50, height/2, 100, height, sideWalls),
+                    Bodies.rectangle(-50, height / 2, 100, height, sideWalls),
+                    Bodies.rectangle(width + 50, height / 2, 100, height, sideWalls),
 
-                    // middle wall
-                    Bodies.rectangle(width/2, height/2, width, 20, {
+                    Bodies.rectangle(width / 2, height * 0.65, width, 20, {
                         isStatic: true,
                         collisionFilter: { category: WALL, mask: LIQUID | GAS }
                     })
@@ -348,35 +187,13 @@
                     max: { x: width, y: height }
                 };
 
-                frameRate(60); // p5js framerate
-                Engine.update(engine, 1000 / 60); // matter js framerate
-
+                frameRate(60);
+                Engine.update(engine, 1000 / 60);
                 Runner.run(engine);
-
-                Matter.Events.on(engine, "collisionStart", event => {
-                    for (const pair of event.pairs) {
-                        const A = pair.bodyA;
-                        const B = pair.bodyB;
-
-                        // Only react if both are water molecules
-                        if (A.label === "water" && B.label === "water") {
-
-                            const vA = A.velocity;
-                            const vB = B.velocity;
-
-                            const relCollisionSpeed = Math.hypot(vA.x - vB.x, vA.y - vB.y);
-
-                            if (relCollisionSpeed > 15) {
-                                triggerReaction(A.parentObject, B.parentObject);
-                            }
-                        }
-                    }
-                });
             }
 
             function draw() {
                 temperature = initial + " °C";
-
                 probability = min(frameCount / 4, 500);
 
                 background(200, 200, 255);
@@ -386,10 +203,10 @@
                 text(temperature, 25, 50);
 
                 fill(100, 100, 255);
-                rect(0, height / 2, width);
+                rect(0, height * 0.65, width);
 
                 // Draw hydrogen bonds
-                stroke(150, 150, 255, 200);   // light blue, semi-transparent
+                stroke(150, 150, 255, 200);
                 strokeWeight(7.5);
 
                 for (let b of hydrogenBonds) {
@@ -401,12 +218,11 @@
                 strokeWeight(1);
                 stroke(0);
 
-
                 if (frameCount % 5 == 0 && frameCount > 30) {
                     initial++;
                 }
 
-                for (var i = 0; i < molecules.length; i++){
+                for (let i = 0; i < molecules.length; i++) {
                     let m = molecules[i];
 
                     m.make();
@@ -414,44 +230,28 @@
 
                     // SLOW VELOCITY INCREASE
                     let v = m.body.velocity;
-                    let speed = Math.sqrt(v.x*v.x + v.y*v.y);
+                    let speed = Math.sqrt(v.x*v.x + v.y*v.y) || 0.0001;
 
-                    // add a constant amount to speed
-                    let newSpeed = speed + 0.05;
+                    let newSpeed = (speed + 0.05);
+                    if(temperature > 120){
+                        newSpeed *= 1.001
+                    }
 
-                    // normalize direction
                     let nx = v.x / speed;
                     let ny = v.y / speed;
 
-                    // apply new velocity
                     Matter.Body.setVelocity(m.body, {
                         x: nx * newSpeed,
                         y: ny * newSpeed
                     });
 
-                    // H2 and O2 stay in TOP half
-                    if (m instanceof h2 || m instanceof o2) {
-                        if (m.body.position.y > height / 2) {
-                            Matter.Body.setPosition(m.body, {
-                                x: m.body.position.x,
-                                y: height / 2 - 10
-                            });
-                            // flip vertical velocity
-                            Matter.Body.setVelocity(m.body, {
-                                x: m.body.velocity.x,
-                                y: -m.body.velocity.y
-                            });
-                        }
-                    }
-
-                    // Water stays in BOTTOM half
-                    if (m instanceof water) {
+                    // Liquid water stays in BOTTOM half
+                    if (m instanceof water && m.state === "liquid") {
                         if (m.body.position.y < height / 2) {
                             Matter.Body.setPosition(m.body, {
                                 x: m.body.position.x,
                                 y: height / 2 + 10
                             });
-                            // flip vertical velocity
                             Matter.Body.setVelocity(m.body, {
                                 x: m.body.velocity.x,
                                 y: -m.body.velocity.y
@@ -460,36 +260,14 @@
                     }
 
                     handleHydrogenBonds();
-
                     m.show();
                 }
-            }
-
-            // runs on sucessful collsion
-            function triggerReaction(w1, w2) {
-                // Remove old bodies
-                World.remove(world, w1.body);
-                World.remove(world, w2.body);
-
-                // Remove from array
-                molecules = molecules.filter(m => m !== w1 && m !== w2);
-
-                // Position for new molecules
-                let pos = w1.body.position;
-
-                // Create new gas molecules using your classes
-                let newO2 = new o2(pos.x, pos.y);
-                let newH2_1st = new h2(pos.x + 80, pos.y);
-                let newH2_2nd = new h2(pos.x + 120, pos.y);
-
-                molecules.push(newO2);
-                molecules.push(newH2_1st);
-                molecules.push(newH2_2nd);
             }
 
             function handleHydrogenBonds() {
                 const bondDistance = 80;      // when to form a bond
                 const breakDistance = 140;    // when to break a bond
+                const minDistance = 60;       // repulsion threshold
 
                 // 1. Try to form new bonds
                 for (let i = 0; i < molecules.length; i++) {
@@ -498,42 +276,41 @@
                         let m1 = molecules[i];
                         let m2 = molecules[j];
 
-                        // Only water molecules can hydrogen bond
+                        // Only water molecules can bond
                         if (!(m1 instanceof water) || !(m2 instanceof water)) continue;
 
+                        // ⭐ Gas water cannot bond
+                        if (m1.state === "gas" || m2.state === "gas") continue;
+
                         // Already bonded?
-                        if (hydrogenBonds.some(b => (b.a == m1 && b.b == m2) || (b.a == m2 && b.b == m1))) {
+                        if (hydrogenBonds.some(b =>
+                            (b.a === m1 && b.b === m2) ||
+                            (b.a === m2 && b.b === m1)
+                        )) {
                             continue;
                         }
 
                         let d = distBodies(m1.body, m2.body);
 
-                        // ⭐ POSITION‑BASED REPULSION ⭐
-                        const minDistance = 60;
+                        // POSITION‑BASED REPULSION 
                         if (d < minDistance) {
-
-                            // vector from m1 → m2
                             let dx = m2.body.position.x - m1.body.position.x;
                             let dy = m2.body.position.y - m1.body.position.y;
 
-                            // normalize direction
                             let mag = Math.sqrt(dx*dx + dy*dy) || 0.0001;
                             dx /= mag;
                             dy /= mag;
 
-                            // repulsive force strength
-                            const force = 0.000025 * (minDistance - d);
+                            const force = 0.000025 * ((minDistance - d) ** 2);
 
-                            // push them apart along the direction vector
                             Matter.Body.applyForce(m1.body, m1.body.position, { x: -dx * force, y: -dy * force });
                             Matter.Body.applyForce(m2.body, m2.body.position, { x:  dx * force, y:  dy * force });
 
-                            continue; // skip bonding logic for this pair
+                            continue;
                         }
 
-                        // close enough to form bond
-                        if (d < breakDistance) {
-                            // creates the hydrogen bond
+                        // Close enough to form a bond
+                        if (d < bondDistance) {
                             let c = Matter.Constraint.create({
                                 bodyA: m1.body,
                                 bodyB: m2.body,
@@ -543,18 +320,18 @@
                             });
 
                             World.add(world, c);
-
                             hydrogenBonds.push({ a: m1, b: m2, constraint: c });
                         }
                     }
                 }
 
-                // 2. Break bonds that stretch too far
+                // Break bonds that stretch too far OR involve gas water
                 for (let i = hydrogenBonds.length - 1; i >= 0; i--) {
                     let bond = hydrogenBonds[i];
                     let d = distBodies(bond.a.body, bond.b.body);
 
-                    if (d > breakDistance) {
+                    // If either molecule became gas → break bond immediately
+                    if (bond.a.state === "gas" || bond.b.state === "gas" || d > breakDistance) {
                         World.remove(world, bond.constraint);
                         hydrogenBonds.splice(i, 1);
                     }

@@ -96,7 +96,7 @@
                         fill(255);
                         ellipse(-31.25, 31.25, 31.25);
                         ellipse(31.25, 31.25, 31.25);
-                    } 
+                    }
                     // else {
                     //     counterGas++
                     //     // O2
@@ -208,7 +208,7 @@
                         fill(255);
                         ellipse(-15.625, 0, 31.25);
                         ellipse(15.625, 0, 31.25);
-                    } 
+                    }
                     // else {
                     //     counterGas++
                     //     // O2
@@ -320,7 +320,7 @@
                         fill(255, 0, 0);
                         ellipse(-31.25, 0, 62.5);
                         ellipse(31.25, 0, 62.5);
-                    } 
+                    }
                     // else {
                     //     counterGas++
                     //     // O2
@@ -398,7 +398,7 @@
                     molecules.push(new water(random(50,width-50),random(height/2 + 31.25,height - 50)))
                 }
 
-                let walls = { 
+                let walls = {
                     isStatic: true,
                     collisionFilter: { category: WALL }
                 };
@@ -433,7 +433,7 @@
                     min: { x: 0, y: 0 },
                     max: { x: width, y: height }
                 };
-                
+
                 frameRate(60); // p5js framerate
                 Engine.update(engine, 1000 / 60); // matter js framerate
 
@@ -534,7 +534,7 @@
                     m.show();
                 }
             }
-            
+
             // runs on sucessful collsion
             function triggerReaction(w1, w2) {
                 // Remove old bodies
@@ -558,7 +558,7 @@
             }
 
 
-            
+
         </script>
     </body>
 </html>

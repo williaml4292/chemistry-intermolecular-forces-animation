@@ -338,7 +338,7 @@
                             dx /= mag;
                             dy /= mag;
 
-                            const force = 0.000025 * ((minDistance - d) ** 2);
+                            const force = 0.00005 * ((minDistance - d) ** 2);
 
                             Matter.Body.applyForce(m1.body, m1.body.position, { x: -dx * force, y: -dy * force });
                             Matter.Body.applyForce(m2.body, m2.body.position, { x:  dx * force, y:  dy * force });

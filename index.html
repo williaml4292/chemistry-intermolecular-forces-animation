@@ -43,7 +43,13 @@
                     this.state = "liquid";   // "liquid" or "gas"
                     this.counter = 0;
 
-                    this.body = Bodies.circle(x, y, 30, {
+                    const angle = radians(45);
+                    const O_RADIUS = 30;
+                    const H_RADIUS = 15;
+                    const H_OFFSET = 45;
+
+                    let oxygen = Bodies.circle(x, y, O_RADIUS, {
+                        label: "oxygen",
                         restitution: 0.8,
                         friction: 0,
                         frictionStatic: 0,
@@ -52,6 +58,31 @@
                             category: LIQUID,
                             mask: WALL | LIQUID | GAS
                         }
+                    });
+
+                    const baseAngle = PI/2 + angle;     // rotate downward
+                    const baseAngle2 = PI/2 - angle;    // symmetric downward
+
+                    let hx1 = x + cos(baseAngle) * H_OFFSET;
+                    let hy1 = y + sin(baseAngle) * H_OFFSET;
+
+                    let hx2 = x + cos(baseAngle2) * H_OFFSET;
+                    let hy2 = y + sin(baseAngle2) * H_OFFSET;
+
+                    let hydrogen1 = Bodies.circle(hx1, hy1, H_RADIUS, {
+                        label: "hydrogen",
+                        collisionFilter: oxygen.collisionFilter
+                    });
+
+                    let hydrogen2 = Bodies.circle(hx2, hy2, H_RADIUS, {
+                        label: "hydrogen",
+                        collisionFilter: oxygen.collisionFilter
+                    });
+
+                    this.body = Matter.Body.create({
+                        parts: [oxygen, hydrogen1, hydrogen2],
+                        frictionAir: 0,
+                        restitution: 0.8
                     });
 
                     Matter.Body.setVelocity(this.body, {
@@ -261,6 +292,12 @@
 
                     handleHydrogenBonds();
                     m.show();
+
+                    // // for debugging
+                    // for (let m of molecules) {
+                    //     debugMatterBody(m.body); // shows the REAL physics shape
+                    //     m.show(); // your visual drawing
+                    // }
                 }
             }
 
@@ -343,6 +380,30 @@
                 let dy = b1.position.y - b2.position.y;
                 return Math.sqrt(dx*dx + dy*dy);
             }
+
+            function debugMatterBody(body) {
+                push();
+                noFill();
+                stroke(0, 255, 0);
+                strokeWeight(2);
+
+                for (let part of body.parts) {
+                    if (part.circleRadius) {
+                        // Draw circles
+                        ellipse(part.position.x, part.position.y, part.circleRadius * 2);
+                    } else {
+                        // Draw polygons
+                        beginShape();
+                        for (let v of part.vertices) {
+                            vertex(v.x, v.y);
+                        }
+                        endShape(CLOSE);
+                    }
+                }
+
+                pop();
+            }
+
 
 
         </script>

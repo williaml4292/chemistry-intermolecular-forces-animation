@@ -162,6 +162,31 @@
                 movement() {
                     if (!this.body || !this.body.velocity) return;
 
+                    if (this.body.position.y > height) { // bottom
+                        Matter.Body.setPosition(this.body, {
+                            x: this.body.position.x,
+                            y: height * 0.95
+                        });
+                    }
+                    if (this.body.position.y < 0) { // top
+                        Matter.Body.setPosition(this.body, {
+                            x: this.body.position.x,
+                            y: height * 0.5
+                        });
+                    }
+                    if (this.body.position.x < 0) {
+                        Matter.Body.setPosition(this.body, {
+                            x: width * 0.05,
+                            y: this.body.position.y
+                        });
+                    }
+                    if (this.body.position.y > width) {
+                        Matter.Body.setPosition(this.body, {
+                            x: width * 0.95,
+                            y: this.body.position.y
+                        });
+                    }
+
                     if (this.state === "liquid") {
                         if (this.body.position.y < height * 0.7) {
                             Matter.Body.setPosition(this.body, {

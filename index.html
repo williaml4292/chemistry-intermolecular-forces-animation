@@ -162,27 +162,27 @@
                 movement() {
                     if (!this.body || !this.body.velocity) return;
 
-                    if (this.body.position.y > height) { // bottom
+                    if (this.body.position.y > height * 0.95) { // bottom
                         Matter.Body.setPosition(this.body, {
                             x: this.body.position.x,
-                            y: height * 0.95
+                            y: height * 0.9
                         });
                     }
-                    if (this.body.position.y < 0) { // top
+                    if (this.body.position.y < height * 0.05) { // top
                         Matter.Body.setPosition(this.body, {
                             x: this.body.position.x,
-                            y: height * 0.5
+                            y: height * 0.1
                         });
                     }
-                    if (this.body.position.x < 0) {
+                    if (this.body.position.x < width * 0.05) { // left
                         Matter.Body.setPosition(this.body, {
-                            x: width * 0.05,
+                            x: width * 0.1,
                             y: this.body.position.y
                         });
                     }
-                    if (this.body.position.y > width) {
+                    if (this.body.position.y > width * 0.95) { // right
                         Matter.Body.setPosition(this.body, {
-                            x: width * 0.95,
+                            x: width * 0.9,
                             y: this.body.position.y
                         });
                     }

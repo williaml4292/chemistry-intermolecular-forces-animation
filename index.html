@@ -111,7 +111,7 @@
                 becomeGas() {
                     this.state = "gas";
 
-                    // remove all hgydrogen bonds connected to this molecule
+                    // remove all hydrogen bonds connected to this molecule
                     for (let i = hydrogenBonds.length - 1; i >= 0; i--) {
                         let bond = hydrogenBonds[i];
                         if (bond.a === this || bond.b === this) {
@@ -180,7 +180,7 @@
                 world = engine.world;
                 engine.gravity.scale = 0;
 
-                createCanvas(800, 600);
+                createCanvas(1000, 650);
 
                 for (let i = 0; i < 10; i++) {
                     molecules.push(new water(
@@ -263,18 +263,27 @@
                     let v = m.body.velocity;
                     let speed = Math.sqrt(v.x*v.x + v.y*v.y) || 0.0001;
 
-                    let newSpeed = (speed + 0.05);
-                    if(temperature > 120){
-                        newSpeed *= 1.001
-                    }
-
+                    // calculate direction of forces 
                     let nx = v.x / speed;
                     let ny = v.y / speed;
 
-                    Matter.Body.setVelocity(m.body, {
-                        x: nx * newSpeed,
-                        y: ny * newSpeed
+                    let newSpeed = (speed + 0.05 + (initial / 25000));
+                    
+                    let forceMagnitude = newSpeed * 0.0005;   // scale this number to tune acceleration
+
+                    //  apply forces
+                    Matter.Body.applyForce(m.body, m.body.position, {
+                        x: nx * forceMagnitude,
+                        y: ny * forceMagnitude
                     });
+
+                    // random molecule gitter
+                    if(temperature > 120) {
+                        Matter.Body.applyForce(m.body, m.body.position, {
+                            x: random(-0.001, 0.001),
+                            y: random(-0.001, 0.001)
+                        });
+                    }
 
                     // Liquid water stays in BOTTOM half
                     if (m instanceof water && m.state === "liquid") {
@@ -298,6 +307,7 @@
                     //     debugMatterBody(m.body); // shows the REAL physics shape
                     //     m.show(); // your visual drawing
                     // }
+                    avgSpeed() // test avg speed
                 }
             }
 
@@ -338,7 +348,11 @@
                             dx /= mag;
                             dy /= mag;
 
-                            const force = 0.00005 * ((minDistance - d) ** 2);
+                            let force = 0.0002 * ((minDistance - d) ** 2);
+
+                            // Limit the maximum repulsion force
+                            const maxForce = 50;
+                            force = Math.min(force, maxForce);
 
                             Matter.Body.applyForce(m1.body, m1.body.position, { x: -dx * force, y: -dy * force });
                             Matter.Body.applyForce(m2.body, m2.body.position, { x:  dx * force, y:  dy * force });
@@ -402,6 +416,19 @@
                 }
 
                 pop();
+            }
+
+            function avgSpeed() {
+                let totalSpeed = 0;
+
+                for (let m of molecules) {
+                    let v = m.body.velocity;
+                    let speed = Math.sqrt(v.x * v.x + v.y * v.y);
+                    totalSpeed += speed;
+                }
+
+                let avgSpeed = totalSpeed / molecules.length;
+                console.log("Avg Speed: " + avgSpeed);
             }
 
 

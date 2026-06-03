@@ -269,7 +269,7 @@
 
                     let newSpeed = (speed + 0.05);
 
-                    let forceMagnitude = newSpeed * (initial/(frameCount**2));   // scale this number to tune acceleration
+                    let forceMagnitude = newSpeed * (frameCount/(initial));   // scale this number to tune acceleration
 
                     //  apply forces
                     Matter.Body.applyForce(m.body, m.body.position, {

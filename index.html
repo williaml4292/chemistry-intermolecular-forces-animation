@@ -147,7 +147,7 @@
                     translate(pos.x, pos.y);
                     rotate(angle);
 
-                    
+
                     // show molecule in p5js
                     fill(255, 0, 0); // Oxygen
                     ellipse(0, 0, 62.5);
@@ -263,12 +263,12 @@
                     let v = m.body.velocity;
                     let speed = Math.sqrt(v.x*v.x + v.y*v.y) || 0.0001;
 
-                    // calculate direction of forces 
+                    // calculate direction of forces
                     let nx = v.x / speed;
                     let ny = v.y / speed;
 
-                    let newSpeed = (speed + 0.05 + (initial / 25000));
-                    
+                    let newSpeed = (speed + 0.05 + (initial / frameCount));
+
                     let forceMagnitude = newSpeed * 0.0005;   // scale this number to tune acceleration
 
                     //  apply forces
@@ -339,7 +339,7 @@
 
                         let d = distBodies(m1.body, m2.body);
 
-                        // POSITION‑BASED REPULSION 
+                        // POSITION‑BASED REPULSION
                         if (d < minDistance) {
                             let dx = m2.body.position.x - m1.body.position.x;
                             let dy = m2.body.position.y - m1.body.position.y;

@@ -267,9 +267,9 @@
                     let nx = v.x / speed;
                     let ny = v.y / speed;
 
-                    let newSpeed = (speed + 0.05 + (initial / (frameCount ** 16)));
+                    let newSpeed = (speed + 0.05);
 
-                    let forceMagnitude = newSpeed * 0.0005;   // scale this number to tune acceleration
+                    let forceMagnitude = newSpeed * (initial/(frameCount**2));   // scale this number to tune acceleration
 
                     //  apply forces
                     Matter.Body.applyForce(m.body, m.body.position, {

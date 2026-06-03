@@ -170,6 +170,12 @@
                             x: (Math.random() - 0.5) * 0.0003,
                             y: (Math.random() - 0.5) * 0.0003
                         });
+                        if (this.body.position.y > height * 0.6) {
+                            Matter.Body.setPosition(this.body, {
+                                x: this.body.position.x,
+                                y: height * 0.55
+                            });
+                        }
                         Matter.Body
                     }
                 }
@@ -267,7 +273,7 @@
                     let nx = v.x / speed;
                     let ny = v.y / speed;
 
-                    let newSpeed = (speed + 0.05 + (initial / 25000));
+                    let newSpeed = (speed + 0.05);
                     
                     let forceMagnitude = newSpeed * 0.0005;   // scale this number to tune acceleration
 

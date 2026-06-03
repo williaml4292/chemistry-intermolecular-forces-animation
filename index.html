@@ -163,7 +163,12 @@
                     if (!this.body || !this.body.velocity) return;
 
                     if (this.state === "liquid") {
-                        // optional: viscosity, damping, etc.
+                        if (this.body.position.y < height * 0.7) {
+                            Matter.Body.setPosition(this.body, {
+                                x: this.body.position.x,
+                                y: height * 0.75
+                            });
+                        }
                     } else if (this.state === "gas") {
                         // tiny random jitter to keep gas moving
                         Matter.Body.applyForce(this.body, this.body.position, {

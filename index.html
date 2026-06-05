@@ -313,6 +313,13 @@
                         y: ny * forceMagnitude
                     });
 
+                    if (speed > 50) {
+                        Matter.Body.setVelocity(m.body, {
+                            x: nx * 20,
+                            y: ny * 20
+                        }); 
+                    }
+
                     // random molecule gitter
                     if(temperature > 120) {
                         Matter.Body.applyForce(m.body, m.body.position, {
